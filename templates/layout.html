@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Virginia Tech Dairy Database">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>VT Dairy DB</title>
+    <meta property="og:title" content="Welcome to VTDairyDB" />
+    <meta property="og:site_name" content="VTDairyDB"/>
+    <meta property="og:url" content="http://kine.vbi.vt.edu/VTDairyDB" />
+    <meta property="og:description" content="This is a database containing health, growth, and genetic information on Virgina Tech's dairy animals" />
+
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='libs/bootstrap.min.css') }}">
+
+    <link href="{{ url_for('static', filename='libs/dashboard.css') }}" rel="stylesheet">
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="{{ url_for('static', filename='libs/jquery.js')}}"></script>
+    <script src="{{ url_for('static', filename='libs/bootstrap.min.js')}}"></script>
+
+    <style>
+    {% block extracss %}
+    {% endblock %}
+    </style>
+
+    {% block extrahead %}
+    {% endblock %}
+
+    <script type="text/javascript">
+    {% block extrajs %}
+    {% endblock %}
+
+    $(document).ready(function () {
+        $("#{{request.endpoint}}").parent().addClass("active");
+    })
+    </script>
+
+  </head>
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Project name</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Settings</a></li>
+            <li><a href="#">Profile</a></li>
+            <li><a href="#">Help</a></li>
+          </ul>
+          <form class="navbar-form navbar-right">
+            <input type="text" class="form-control" placeholder="Search...">
+          </form>
+        </div>
+      </div>
+    </nav>
+
+<div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
+            <li><a href="#">Data</a></li>
+            <li><a href="#">Upload</a></li>
+            <li><a href="#">Account</a></li>
+          </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h1 class="page-header">{% block title %}{% endblock %}</h1>
+
+          <div class="row placeholders">
+            {% block body %}
+            {% endblock %}
+          </div>
+        </div>
+      </div>
+</div>
+
+<!-- begin footer -->
+<hr></hr>
+  <footer class="footer" style="margin-top:20px;">
+    <div class="container">
+      <p class="pull-right">
+        {% if g.user %}
+          <span>{{ g.user.email}}</span> | <a href="#">Back to top</a>
+        {% else %}
+          <span>Not logged in</span> | <a href="#">Back to top</a>
+        {% endif %}
+      </p>
+      <p>
+        &copy; Copyright 2016 Eleonor Bart, DASC.
+      </p>
+    </div>
+  </footer>
+<!-- end footer -->
+
+</body>
+
+</html>
