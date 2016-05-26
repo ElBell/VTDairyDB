@@ -70,3 +70,11 @@ class Role(Base, RoleMixin):
 
     def __str__(self):
         return '<User {} is {}>'.format(self.user_id, self.name)
+
+#Begin models for animal data ----------------------------------------------------------------------------
+class LifeData(Base):
+    __tablename__ = 'life_data'
+    fid = Column(Integer())
+    eid = Column(Integer())
+    breed = Column(String(20))
+    dob = Column(Date())

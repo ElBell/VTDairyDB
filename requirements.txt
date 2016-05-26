@@ -6,3 +6,4 @@ Flask-Script
 sqlalchemy
 passlib
 bcrypt
+pandas

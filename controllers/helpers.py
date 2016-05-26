@@ -10,6 +10,7 @@ import json
 from flask import g, request, redirect, url_for, make_response, current_app
 from flask import flash
 
+
 def admin_required(function):
     @wraps(function)
     def decorated_function(*args, **kwargs):

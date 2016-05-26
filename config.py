@@ -20,6 +20,7 @@ class Config(object):
     SYS_ADMINS = ['eleonorc@vt.edu']
     ROOT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
     STATIC_DIRECTORY = os.path.join(ROOT_DIRECTORY, 'static')
+    UPLOAD_FOLDER = os.path.join(ROOT_DIRECTORY, 'uploads')
 
     #secret key for flask authentification
     SECRET_KEY = secrets.get('FLASK_SECRET_KEY', 'flask-secret-key')

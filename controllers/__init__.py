@@ -10,11 +10,6 @@ def homepage():
     return render_template('homepage.html')
 
 
-@app.route('/cow', methods=['GET', 'POST'])
-def hello_cow():
-    return 'M<i>ooooo</i>'
-
-
 @app.route("/site-map", methods=['GET', 'POST'])
 def site_map():
     import urllib
@@ -38,4 +33,7 @@ def site_map():
 #
 from admin import admin
 import security
+
+import cow
+import uploads
 
