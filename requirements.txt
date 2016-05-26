@@ -2,5 +2,7 @@ flask
 Flask-SQLAlchemy
 flask-admin
 flask-security
-flask-script
+Flask-Script
 sqlalchemy
+passlib
+bcrypt

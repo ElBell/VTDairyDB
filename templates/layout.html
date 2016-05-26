@@ -56,14 +56,21 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="#">Dashboard</a></li>
             <li><a href="#">Settings</a></li>
             <li><a href="#">Profile</a></li>
             <li><a href="#">Help</a></li>
           </ul>
-          <form class="navbar-form navbar-right">
-            <input type="text" class="form-control" placeholder="Search...">
-          </form>
+          {% if g.user %}
+          <p class="navbar-text navbar-right">Signed in as {{ g.user.name() }} <a href="{{ url_for('security.logout') }}" class="navbar-link">(log out)</a></p>
+          {% else %}
+          <p class="navbar-right navbar-btn">
+          <a class="navbar-link btn btn-default" href="{{ url_for('security.login') }}">Log in</a>
+          <a class="navbar-link btn btn-default" href="{{ url_for('security.register') }}">Register</a>
+          </p>
+          {% endif %}
+           <form class="navbar-form navbar-right">
+             <input type="text" class="form-control" placeholder="Search...">
+           </form>
         </div>
       </div>
     </nav>
@@ -73,7 +80,7 @@
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
             <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
-            <li><a href="#">Data</a></li>
+            <li><a href="{{ url_for( 'hello_cow' ) }}">Data</a></li>
             <li><a href="#">Upload</a></li>
             <li><a href="#">Account</a></li>
           </ul>

@@ -39,6 +39,7 @@ class Config(object):
     SECURITY_PASSWORD_SALT=secrets.get('SECURITY_PASSWORD_SALT')
     SECURITY_DEFAULT_REMEMBER_ME = True
 
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class ProductionConfig(Config):
     DEBUG = False
