@@ -3,7 +3,7 @@ import sys, os
 from main import app
 from flask_script import Manager, Server, Command, Option
 from flask_security.utils import encrypt_password
-from models import db
+from models import db, populate_db
 from main import app
 import datetime
 import random
@@ -21,28 +21,8 @@ class PopulateDB(Command):
 
     """Fills in predefined data into DB"""
     def run(self, user_data_file, **kwargs):
-        from models import Role, User
-
-        print("Adding Admin")
-        admin = User(first_name='Eleonor', last_name='Bart',
-                     password=encrypt_password('dairy5'),
-                     confirmed_at=datetime.datetime.now(),
-                     active= True,
-                     email='eleonorc@vt.edu')
-        db.session.add(admin)
-        db.session.flush()
-        db.session.add(Role(name='admin', user_id=admin.id))
-
-        print("Adding some students for color")
-        for user in ('Dan Tilden', 'Anamary Leal', 'Cory Bart'):
-            first, last = user.split()
-            email = '{}{}@vt.edu'.format(first[0].lower(), last.lower())
-            db.session.add(User(first_name=first, last_name=last, email=email))
-
-
-        db.session.commit()
         print("Complete")
-
+        populate_db()
 
 class DisplayDB(Command):
     def run(self, **kwargs):

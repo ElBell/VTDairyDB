@@ -3,10 +3,10 @@ __author__ = 'Eleonor Bart'
 from flask_admin import Admin, BaseView, expose, form
 from flask_admin.contrib.sqla import ModelView
 from flask import g, Blueprint, request, url_for, render_template, Response
-
 from main import app
 from controllers.helpers import admin_required
-from models import (User, Role, db)
+from models import User, Role, db, LifeData
+
 
 admin = Admin(app)
 
@@ -49,3 +49,5 @@ class RoleView(RegularView):
 
 admin.add_view(UserView(User, db.session, category='Tables'))
 admin.add_view(RoleView(Role, db.session, category='Tables'))
+admin.add_view(ModelIdView(LifeData, db.session, category='Tables'))
+

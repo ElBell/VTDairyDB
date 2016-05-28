@@ -81,7 +81,7 @@
           <ul class="nav nav-sidebar">
             <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
             <li><a href="{{ url_for( 'hello_cow' ) }}">Cow</a></li>
-            <li><a href="{{ url_for( 'uploads' ) }}">Upload</a></li>
+            <li><a href="{{ url_for( 'uploads' ) }}">Uploads</a></li>
             <li><a href="#">Account</a></li>
           </ul>
         </div>
@@ -89,6 +89,15 @@
           <h1 class="page-header">{% block title %}{% endblock %}</h1>
 
           <div class="row placeholders">
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                <div>
+                {% for message in messages %}
+                  <div class="alert alert-success" role="alert">{{ message }}</div>
+                {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
             {% block body %}
             {% endblock %}
           </div>
@@ -97,7 +106,7 @@
 </div>
 
 <!-- begin footer -->
-<hr></hr>
+<hr> </hr>
   <footer class="footer" style="margin-top:20px;">
     <div class="container">
       <p class="pull-right">

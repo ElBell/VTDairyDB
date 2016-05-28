@@ -1,8 +1,11 @@
 # All the data and junk
 uploads/
+data/
+logs/
 
 secrets.json
 test.db
+unittest.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

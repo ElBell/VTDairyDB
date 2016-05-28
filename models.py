@@ -1,6 +1,7 @@
 __author__ = 'Eleonor Bart'
 
 from datetime import datetime, timedelta
+from flask_security.utils import encrypt_password
 import time
 import re
 import os
@@ -78,3 +79,21 @@ class LifeData(Base):
     eid = Column(Integer())
     breed = Column(String(20))
     dob = Column(Date())
+
+def populate_db():
+    admin = User(first_name='Eleonor', last_name='Bart',
+                 password=encrypt_password('dairy5'),
+                 confirmed_at=datetime.now(),
+                 active= True,
+                 email='eleonorc@vt.edu')
+    db.session.add(admin)
+    db.session.flush()
+    db.session.add(Role(name='admin', user_id=admin.id))
+
+    for user in ('Dan Tilden', 'Anamary Leal', 'Cory Bart'):
+        first, last = user.split()
+        email = '{}{}@vt.edu'.format(first[0].lower(), last.lower())
+        db.session.add(User(first_name=first, last_name=last, email=email))
+
+
+    db.session.commit()
