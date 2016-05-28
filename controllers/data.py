@@ -7,9 +7,9 @@ import pandas
 from models import LifeData, db
 from dateutil import parser
 
-@app.route('/data', methods=['GET', 'POST'])
+
+@app.route('/data', methods=['GET'])
 def data():
-    currentTable = LifeData.query.all()
+    life_data_table = LifeData.query.all()
 
-
-    return render_template('data.html')
+    return render_template('data.html', current_table=life_data_table)

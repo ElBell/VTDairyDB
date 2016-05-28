@@ -1,10 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
+{%extends 'layout.html'%}
 
-</body>
-</html>
+{% block title %}
+Data
+{% endblock %}
+
+{% block extracss %}
+
+.table-nonfluid {
+    width: auto !important;
+}
+
+{% endblock %}
+
+{% block extrahead %}
+
+<script type="text/javascript">
+$(document).ready(function(){
+    $('#currentTable').DataTable();
+});
+</script>
+
+{% endblock %}
+
+{% block body %}
+
+<table class="table table-striped table-bordered table-hover table-nonfluid" id="currentTable" class="table">
+     <thead>
+        <tr>
+            <th>FID</th>
+            <th>EID</th>
+            <th>Breed</th>
+            <th>Date of Birth</th>
+        </tr>
+     </thead>
+    <tbody>
+{% for row in current_table %}
+        <tr>
+            <td>{{ row.fid }}</td>
+            <td>{{ row.eid }}</td>
+            <td>{{ row.breed }}</td>
+            <td>{{ row.dob }}</td>
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+
+{% endblock%}
