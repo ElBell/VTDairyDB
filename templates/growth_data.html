@@ -28,18 +28,22 @@ $(document).ready(function(){
      <thead>
         <tr>
             <th>FID</th>
-            <th>EID</th>
             <th>Breed</th>
             <th>Date of Birth</th>
+            <th>BirthWt</th>
+            <th>Status</th>
+            <th>Status Date</th>
         </tr>
      </thead>
     <tbody>
 {% for row in current_table %}
         <tr>
             <td>{{ row.fid }}</td>
-            <td>{{ row.eid }}</td>
             <td>{{ row.breed }}</td>
             <td>{{ row.dob }}</td>
+            <td>{{ row.bwt }}</td>
+            <td>{{ row.status }}</td>
+            <td>{{ row.status_date }}</td>
         </tr>
 {% endfor %}
     </tbody>
