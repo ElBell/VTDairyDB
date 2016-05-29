@@ -4,7 +4,7 @@ __author__ = 'Eleonor Bart'
 
 import os
 from main import app
-from models import db, populate_db, LifeData
+from models import db, populate_db, LifeData, GrowthData, BirthStatusData
 import unittest
 import tempfile
 from flask_security import current_user
@@ -48,13 +48,24 @@ class VTDairyDBTestCase(unittest.TestCase):
             assert 'Invalid password' in rv.data
     """
 
-    def test_upload(self):
+    def test_life_upload(self):
         with open('data/lifeData.csv', 'rb') as life_data_file:
             raw_data = life_data_file.read()
         self.app.post('/uploads', data=dict(
-            file=('data/lifeData.csv', raw_data)
+            file=('data/lifeData.csv', raw_data),
+            type='life_data'
             ), follow_redirects=True)
         currentTable = LifeData.query.all()
+        self.assertTrue(currentTable)
+
+    def test_growth_upload(self):
+        with open('data/growthData.xlsx', 'rb') as growth_data_file:
+            raw_data = growth_data_file.read()
+        self.app.post('/uploads', data=dict(
+            file=('data/growthData.xlsx', raw_data),
+            type='growth_data'
+            ), follow_redirects=True)
+        currentTable = GrowthData.query.all()
         self.assertTrue(currentTable)
 
 if __name__ == '__main__':

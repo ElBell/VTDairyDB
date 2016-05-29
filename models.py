@@ -16,7 +16,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from flask_security import UserMixin, RoleMixin, login_required
 from sqlalchemy import event, Integer, Date, ForeignKey, Column, Table,\
                        String, Boolean, DateTime, Text, ForeignKeyConstraint,\
-                       cast, func
+                       cast, func, Float
 from sqlalchemy.ext.declarative import declared_attr
 
 db = SQLAlchemy(app)
@@ -24,12 +24,14 @@ Model = db.Model
 relationship = db.relationship
 backref = db.backref
 
+
 def ensure_dirs(path):
     try:
         os.makedirs(path)
     except OSError, e:
         if not os.path.isdir(path):
             app.logger.warning(e.args + (path, ) )
+
 
 class Base(Model):
     __abstract__  = True
@@ -79,6 +81,28 @@ class LifeData(Base):
     eid = Column(Integer())
     breed = Column(String(20))
     dob = Column(Date())
+
+
+class BirthStatusData(Base):
+    __tablename__ = 'birth_status_data'
+    fid = Column(Integer())
+    dob = Column(Date())
+    breed = Column(String(20))
+    # Birthweight must be loaded as a string because some of the data is estimated (denoted with an e )
+    bwt = Column(String(20))
+    status = Column(String(20))
+    status_date = Column(Date())
+
+
+class GrowthData(Base):
+    __tablename__ = 'growth_data'
+    fid = Column(Integer())
+    date = Column(Date())
+    location = Column(String(20))
+    weight = Column(Integer())
+    height = Column(Float())
+    bcs = Column(Float())
+
 
 def populate_db():
     admin = User(first_name='Eleonor', last_name='Bart',

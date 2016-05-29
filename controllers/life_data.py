@@ -8,8 +8,8 @@ from models import LifeData, db
 from dateutil import parser
 
 
-@app.route('/data', methods=['GET'])
-def data():
+@app.route('/life_data', methods=['GET'])
+def life_data():
     life_data_table = LifeData.query.all()
 
-    return render_template('data.html', current_table=life_data_table)
+    return render_template('life_data.html', current_table=life_data_table)

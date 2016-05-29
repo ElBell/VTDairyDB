@@ -36,5 +36,6 @@ import security
 
 import cow
 import uploads
-import data
+import life_data
+import growth_data
 
