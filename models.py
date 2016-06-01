@@ -85,7 +85,6 @@ class LifeData(Base):
     estimate = Boolean()
 
 
-
 class StatusData(Base):
     __tablename__ = 'birth_status_data'
     fid = Column(Integer())
@@ -101,6 +100,10 @@ class GrowthData(Base):
     weight = Column(Integer())
     height = Column(Float())
     bcs = Column(Float())
+    lifetime_adg = Column(Integer())
+    monthly_adg = Column(Integer())
+    age = Column(Integer())
+    monthly_height_change = Column(Integer())
 
 
 def populate_db():

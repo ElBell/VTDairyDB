@@ -27,6 +27,8 @@ class PopulateDB(Command):
     def run(self, user_data_file, **kwargs):
         print("Complete")
         populate_db()
+
+
 def parse_float(val):
     try:
         float(val)
@@ -36,6 +38,20 @@ def parse_float(val):
             return None
         print(val)
         raise Exception
+
+
+class ConvertAll(Command):
+    def run(self):
+        for animal in GrowthData.query.all():
+            animal.weight = animal.weight*0.453592 if isinstance(animal.weight, (int, float)) else None
+            animal.height = animal.height*2.54 if isinstance(animal.height, (int, float)) else None
+        db.session.commit()
+        print("GrowthData converted")
+        for animal in LifeData.query.all():
+            animal.bwt = animal.bwt*0.453592 if isinstance(animal.bwt, (int, float)) else None
+        db.session.commit()
+        print("LifeData converted")
+
 
 class ProcessLifeData(Command):
     option_list = (
@@ -59,7 +75,7 @@ class ProcessLifeData(Command):
                 life.dob=parser.parse(row['DOB'])
                 life.breed=row['Breed']
                 life.eid=row['EID']
-        # Add won't happen without commit
+        # Add won't happen without it
         db.session.commit()
 
 class ProcessGrowthData(Command):
@@ -80,7 +96,8 @@ class ProcessGrowthData(Command):
                 life = LifeData(fid=int(index), bwt=row['BWt'], dob=row['Birthdate'], breed=row['Brd'], estimate=True if type(row['Estimate']) is unicode else False)
                 db.session.add(life)
             else:
-                life.bwt = row['BWt']
+                if life.bwt is not None:
+                    life.bwt = row['BWt']
                 life.dob = row['Birthdate']
                 life.breed = row['Brd']
                 life.estimate = True if type(row['Estimate']) is unicode else False
@@ -91,7 +108,7 @@ class ProcessGrowthData(Command):
         for row_name, row in tqdm(growth_data_old.iterrows()):
             row = row.where((pandas.notnull(row)), None)
             for date_name, weight_data in row.unstack().iterrows():
-                weight = weight_data['W'] if type(weight_data['W']) != pandas.tslib.NaTType else None
+                weight = weight_data['W'] if type(weight_data['W']) == int or type(weight_data['W']) == float else None
                 date = weight_data['D'] if type(weight_data['D']) != pandas.tslib.NaTType else None
                 location = weight_data['L'] if type(weight_data['L']) != pandas.tslib.NaTType else None
                 height = weight_data['H'] if type(weight_data['H']) != pandas.tslib.NaTType else None
@@ -109,7 +126,7 @@ class ProcessGrowthData(Command):
             row = row.where((pandas.notnull(row)), None)
             for date_name, weight_data in row.unstack().iterrows():
                 date = datetime.strptime(date_name, '%y%m%d').date()
-                weight = weight_data['W'] if type(weight_data['W']) != pandas.tslib.NaTType else None
+                weight = weight_data['W'] if type(weight_data['W']) == int or type(weight_data['W']) == float else None
                 location = weight_data['L'] if type(weight_data['L']) != pandas.tslib.NaTType else None
                 bcs = weight_data['C']
                 # print(type(bcs))
@@ -149,6 +166,7 @@ manager.add_command("populate_db", PopulateDB())
 manager.add_command("display_db", DisplayDB())
 manager.add_command("process_growth_data", ProcessGrowthData())
 manager.add_command("process_life_data", ProcessLifeData())
+manager.add_command("convert_all", ConvertAll())
 
 if __name__ == "__main__":
     manager.run()

@@ -39,28 +39,45 @@ Growth Data: Monthly Reports
     <tbody>
         {% for breed in breeds %}
             <tr><th>{{ breed }}</th><td></td><td colspan="1+{{ locations|length }}"></td></tr>
+
             <!-- Age -->
             <tr><td></td><th>Average Age (d)</th>
             {% for location in locations %}
-            <td>{{ inside_data[breed, location].average_age|round(2) if (breed, location) in inside_data  and inside_data[breed, location] is not none}}</td>
+            <td>{{ inside_data[breed, location].average_age|round(2) if (breed, location) in inside_data and inside_data[breed, location] is not none and inside_data[breed, location].average_age is not none}}</td>
             {% endfor %}
-            <th>{{ subtotal_breed[breed].average_age|round(2) if breed in subtotal_breed  and subtotal_breed[breed] is not none}}</th>
+            <th>{{ subtotal_breed[breed].average_age|round(2) if breed in subtotal_breed and subtotal_breed[breed] is not none and subtotal_breed[breed].average_age is not none}}</th>
             </tr>
 
             <!-- Weight -->
-            <tr><td></td><th>Average Weight (lb)</th>
+            <tr><td></td><th>Average Weight (kg)</th>
             {% for location in locations %}
-            <td>{{ inside_data[breed, location].average_weight|round(2) if (breed, location) in inside_data  and inside_data[breed, location] is not none}}</td>
+            <td>{{ inside_data[breed, location].average_weight|round(2) if (breed, location) in inside_data and inside_data[breed, location] is not none and inside_data[breed, location].average_weight is not none}}</td>
             {% endfor %}
-            <th>{{ subtotal_breed[breed].average_weight|round(2) if breed in subtotal_breed  and subtotal_breed[breed] is not none}}</th>
+            <th>{{ subtotal_breed[breed].average_weight|round(2) if breed in subtotal_breed and subtotal_breed[breed] is not none and subtotal_breed[breed].average_weight is not none }}</th>
+            </tr>
+
+            <!-- Monthly ADG -->
+            <tr><td></td><th>Average Monthly ADG (kg/d)</th>
+            {% for location in locations %}
+            <td>{{ inside_data[breed, location].average_monthly_adg|round(2) if (breed, location) in inside_data and inside_data[breed, location] is not none and inside_data[breed, location].average_monthly_adg is not none}}</td>
+            {% endfor %}
+            <th>{{ subtotal_breed[breed].average_monthly_adg|round(2) if breed in subtotal_breed and subtotal_breed[breed] is not none and subtotal_breed[breed].average_monthly_adg is not none}}</th>
+            </tr>
+
+            <!-- Lifetime ADG -->
+            <tr><td></td><th>Average Lifetime ADG (kg/d)</th>
+            {% for location in locations %}
+            <td>{{ inside_data[breed, location].average_lifetime_adg|round(2) if (breed, location) in inside_data  and inside_data[breed, location] is not none and inside_data[breed, location].average_age is not none}}</td>
+            {% endfor %}
+            <th>{{ subtotal_breed[breed].average_lifetime_adg|round(2) if breed in subtotal_breed and subtotal_breed[breed] is not none and subtotal_breed[breed].average_age is not none}}</th>
             </tr>
 
             <!-- Height -->
-            <tr><td></td><th>(Average Hip Height (in)</th>
+            <tr><td></td><th>Average Hip Height (cm)</th>
             {% for location in locations %}
-            <td>{{ inside_data[breed, location].average_height|round(2) if (breed, location) in inside_data  and inside_data[breed, location] is not none}}</td>
+            <td>{{ inside_data[breed, location].average_height|round(2) if (breed, location) in inside_data and inside_data[breed, location] is not none and inside_data[breed, location].average_height is not none }}</td>
             {% endfor %}
-            <th>{{ subtotal_breed[breed].average_height|round(2) if breed in subtotal_breed and subtotal_breed[breed] is not none }}</th>
+            <th>{{ subtotal_breed[breed].average_height|round(2) if breed in subtotal_breed and subtotal_breed[breed] is not none and subtotal_breed[breed].average_height is not none }}</th>
             </tr>
 
             <!-- Count -->
@@ -75,21 +92,35 @@ Growth Data: Monthly Reports
         <tr>
             <th colspan="2">Total Average Age (d)</th>
             {% for location in locations %}
-            <td>{{ subtotal_location[location].average_age|round(2) if location in subtotal_location and subtotal_location[location] is not none }}</td>
+            <td>{{ subtotal_location[location].average_age|round(2) if location in subtotal_location and subtotal_location[location] is not none and subtotal_location[location].average_age is not none}}</td>
             {% endfor %}
-            <th>{{ grand_total.average_age|round(2) if grand_total and grand_total.average_weight is not none }}</th>
+            <th>{{ grand_total.average_age|round(2) if grand_total and grand_total.average_age is not none }}</th>
         </tr>
         <tr>
-            <th colspan="2">Total Average Weight (lb)</th>
+            <th colspan="2">Total Average Weight (kg)</th>
             {% for location in locations %}
-            <td>{{ subtotal_location[location].average_weight|round(2) if location in subtotal_location and subtotal_location[location] is not none }}</td>
+            <td>{{ subtotal_location[location].average_weight|round(2) if location in subtotal_location and subtotal_location[location] is not none and subtotal_location[location].average_weight is not none }}</td>
             {% endfor %}
             <th>{{ grand_total.average_weight|round(2) if grand_total and grand_total.average_weight is not none }}</th>
         </tr>
         <tr>
-            <th colspan="2">Total Average Hip Height (in)</th>
+        <th colspan="2">Total Average Monthly ADG (kg/d)</th>
+        {% for location in locations %}
+        <td>{{ subtotal_location[location].average_monthly_adg|round(2) if location in subtotal_location and subtotal_location[location] is not none and subtotal_location[location].average_monthly_adg is not none }}</td>
+        {% endfor %}
+        <th>{{ grand_total.average_monthly_adg|round(2) if grand_total and grand_total.average_monthly_adg is not none }}</th>
+        </tr>
+        <tr>
+            <th colspan="2">Total Average Lifetime ADG (kg/d)</th>
             {% for location in locations %}
-            <td>{{ subtotal_location[location].average_height|round(2) if location in subtotal_location and subtotal_location[location] is not none}}</td>
+            <td>{{ subtotal_location[location].average_lifetime_adg|round(2) if location in subtotal_location and subtotal_location[location] is not none and subtotal_location[location].average_lifetime_adg is not none }}</td>
+            {% endfor %}
+            <th>{{ grand_total.average_lifetime_adg|round(2) if grand_total and grand_total.average_lifetime_adg is not none }}</th>
+        </tr>
+        <tr>
+            <th colspan="2">Total Average Hip Height (cm)</th>
+            {% for location in locations %}
+            <td>{{ subtotal_location[location].average_height|round(2) if location in subtotal_location and subtotal_location[location] is not none and subtotal_location[location].average_height is not none }}</td>
             {% endfor %}
             <th>{{ grand_total.average_height|round(2) if grand_total and grand_total.average_height is not none }}</th>
         </tr>
