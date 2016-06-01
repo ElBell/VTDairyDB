@@ -12,6 +12,13 @@ app = Flask(__name__)
 
 app.config.from_object('config.TestingConfig')
 
+from natsort import natsorted, ns
+app.jinja_env.filters['natsorted'] = natsorted
+BREED_VALUE = {'HO': 1, 'JE': 2, 'HJ': 3, 'HX': 4, 'JX': 5}
+def breed_sort(a_list):
+    return sorted(a_list, key=lambda x: BREED_VALUE.get(x, 6))
+app.jinja_env.filters['breed_sort'] = breed_sort
+
 file_handler = FileHandler('logs/run.log')
 file_handler.setLevel(logging.DEBUG)
 app.logger.addHandler(file_handler)

@@ -5,7 +5,7 @@ from flask import session, g, send_from_directory, request, jsonify, render_temp
 import os
 from werkzeug import secure_filename
 import pandas
-from models import LifeData, db, GrowthData, BirthStatusData
+from models import LifeData, db, GrowthData, StatusData
 from dateutil import parser
 
 
@@ -49,8 +49,6 @@ def uploads():
                     for date_name, weight_data in row.unstack().iterrows():
                         print("Adding weighing "+str(row_name)+", "+date_name+":", weight_data.get('D', date_name), weight_data['L'], weight_data['W'], weight_data['H'])
                 app.logger.info(data)
-
-
 
     return render_template('uploads.html')
 

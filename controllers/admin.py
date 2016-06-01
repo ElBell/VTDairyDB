@@ -5,7 +5,7 @@ from flask_admin.contrib.sqla import ModelView
 from flask import g, Blueprint, request, url_for, render_template, Response
 from main import app
 from controllers.helpers import admin_required
-from models import User, Role, db, LifeData, BirthStatusData, GrowthData
+from models import User, Role, db, LifeData, StatusData, GrowthData
 
 
 admin = Admin(app)
@@ -50,7 +50,7 @@ class RoleView(RegularView):
 admin.add_view(UserView(User, db.session, category='Tables'))
 admin.add_view(RoleView(Role, db.session, category='Tables'))
 admin.add_view(ModelIdView(LifeData, db.session, category='Tables'))
-admin.add_view(ModelIdView(BirthStatusData, db.session, category='Tables'))
+admin.add_view(ModelIdView(StatusData, db.session, category='Tables'))
 admin.add_view(ModelIdView(GrowthData, db.session, category='Tables'))
 
 

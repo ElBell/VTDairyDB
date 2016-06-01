@@ -87,7 +87,12 @@
             <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
             <!---<li><a href="{{ url_for( 'hello_cow' ) }}">Cow</a></li> -->
             <li><a href="{{ url_for( 'life_data' ) }}">Life Data</a></li>
-            <li><a href="{{ url_for( 'growth_data' ) }}">Growth Data</a></li>
+            <li><a href="{{ url_for( 'growth_data_monthly_reports', month='current' ) }}">Growth Data</a>
+                <ul>
+                <li><a href="{{ url_for( 'growth_data_monthly_reports' ) }}">Monthly Reports</a></li>
+                <li><a href="{{ url_for( 'growth_data_individual_reports' ) }}">Individual Reports</a></li>
+                <li><a href="{{ url_for( 'total_growth_data' ) }}">All Growth Data</a></li>
+                </ul></li>
             <li><a href="{{ url_for( 'uploads' ) }}">Uploads</a></li>
             <li><a href="#">Account</a></li>
           </ul>

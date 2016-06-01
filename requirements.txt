@@ -9,3 +9,5 @@ bcrypt
 pandas
 python-dateutil
 xlrd
+tqdm
+natsort

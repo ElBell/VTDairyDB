@@ -81,15 +81,14 @@ class LifeData(Base):
     eid = Column(Integer())
     breed = Column(String(20))
     dob = Column(Date())
+    bwt = Column(Integer())
+    estimate = Boolean()
 
 
-class BirthStatusData(Base):
+
+class StatusData(Base):
     __tablename__ = 'birth_status_data'
     fid = Column(Integer())
-    dob = Column(Date())
-    breed = Column(String(20))
-    # Birthweight must be loaded as a string because some of the data is estimated (denoted with an e )
-    bwt = Column(String(20))
     status = Column(String(20))
     status_date = Column(Date())
 
