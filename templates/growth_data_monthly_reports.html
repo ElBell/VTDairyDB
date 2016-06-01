@@ -80,6 +80,14 @@ Growth Data: Monthly Reports
             <th>{{ subtotal_breed[breed].average_height|round(2) if breed in subtotal_breed and subtotal_breed[breed] is not none and subtotal_breed[breed].average_height is not none }}</th>
             </tr>
 
+            <!-- Average Monthly Height Change -->
+            <tr><td></td><th>Average Monthly Height Change (mm/d)</th>
+            {% for location in locations %}
+            <td>{{ inside_data[breed, location].average_monthly_height_change|round(2) if (breed, location) in inside_data  and inside_data[breed, location] is not none and inside_data[breed, location].average_monthly_height_change is not none}}</td>
+            {% endfor %}
+            <th>{{ subtotal_breed[breed].average_monthly_height_change|round(2) if breed in subtotal_breed and subtotal_breed[breed] is not none and subtotal_breed[breed].average_monthly_height_change is not none}}</th>
+            </tr>
+
             <!-- Count -->
             <tr><td></td><th>n</th>
             {% for location in locations %}
@@ -123,6 +131,13 @@ Growth Data: Monthly Reports
             <td>{{ subtotal_location[location].average_height|round(2) if location in subtotal_location and subtotal_location[location] is not none and subtotal_location[location].average_height is not none }}</td>
             {% endfor %}
             <th>{{ grand_total.average_height|round(2) if grand_total and grand_total.average_height is not none }}</th>
+        </tr>
+        <tr>
+            <th colspan="2">Total Average Monthly Height Change (mm/d)</th>
+            {% for location in locations %}
+            <td>{{ subtotal_location[location].average_monthly_height_change|round(2) if location in subtotal_location and subtotal_location[location] is not none and subtotal_location[location].average_monthly_height_change is not none }}</td>
+            {% endfor %}
+            <th>{{ grand_total.average_monthly_height_change|round(2) if grand_total and grand_total.average_monthly_height_change is not none }}</th>
         </tr>
         <tr>
             <th colspan="2">Total n</th>

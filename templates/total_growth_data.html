@@ -1,15 +1,7 @@
 {%extends 'layout.html'%}
 
 {% block title %}
-Growth Data
-{% endblock %}
-
-{% block extracss %}
-
-.table-nonfluid {
-    width: auto !important;
-}
-
+Growth Data: Total Data
 {% endblock %}
 
 {% block extrahead %}
@@ -28,22 +20,22 @@ $(document).ready(function(){
      <thead>
         <tr>
             <th>FID</th>
-            <th>Breed</th>
-            <th>Date of Birth</th>
-            <th>BirthWt</th>
-            <th>Status</th>
-            <th>Status Date</th>
+            <th>Date</th>
+            <th>Location</th>
+            <th>Weight</th>
+            <th>Height</th>
+            <th>BCS</th>
         </tr>
      </thead>
     <tbody>
 {% for row in current_table %}
         <tr>
             <td>{{ row.fid }}</td>
-            <td>{{ row.breed }}</td>
-            <td>{{ row.dob }}</td>
-            <td>{{ row.bwt }}</td>
-            <td>{{ row.status }}</td>
-            <td>{{ row.status_date }}</td>
+            <td>{{ row.date }}</td>
+            <td>{{ row.location }}</td>
+            <td>{{ row.weight }}</td>
+            <td>{{ row.height }}</td>
+            <td>{{ row.bcs }}</td>
         </tr>
 {% endfor %}
     </tbody>
