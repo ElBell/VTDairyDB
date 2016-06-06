@@ -75,6 +75,8 @@ class Role(Base, RoleMixin):
         return '<User {} is {}>'.format(self.user_id, self.name)
 
 #Begin models for animal data ----------------------------------------------------------------------------
+
+
 class LifeData(Base):
     __tablename__ = 'life_data'
     fid = Column(Integer())
@@ -90,6 +92,17 @@ class StatusData(Base):
     fid = Column(Integer())
     status = Column(String(20))
     status_date = Column(Date())
+
+
+class GrowthDataAverages(Base):
+    __tablename__ = 'growth_data_averages'
+    fid = Column(Integer())
+    most_recent_date = Column(Date())
+    last_date = Column(Date())
+    lifetime_adg = Column(Integer())
+    monthly_adg = Column(Integer())
+    age = Column(Integer())
+    monthly_height_change = Column(Integer())
 
 
 class GrowthData(Base):

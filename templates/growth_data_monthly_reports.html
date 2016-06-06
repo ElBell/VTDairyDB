@@ -43,9 +43,9 @@ Growth Data: Monthly Reports
             <!-- Age -->
             <tr><td></td><th>Average Age (d)</th>
             {% for location in locations %}
-            <td>{{ inside_data[breed, location].average_age|round(2) if (breed, location) in inside_data and inside_data[breed, location] is not none and inside_data[breed, location].average_age is not none}}</td>
+            <td>{{ inside_data[breed, location].average_age|round(2) if (breed, location) in inside_data and inside_data[breed, location] is not none and inside_data[breed, location].average_age is not none  }}</td>
             {% endfor %}
-            <th>{{ subtotal_breed[breed].average_age|round(2) if breed in subtotal_breed and subtotal_breed[breed] is not none and subtotal_breed[breed].average_age is not none}}</th>
+            <th>{{ subtotal_breed[breed].average_age|round(2) if breed in subtotal_breed and subtotal_breed[breed] is not none and subtotal_breed[breed].average_age is not none  }}</th>
             </tr>
 
             <!-- Weight -->
@@ -149,7 +149,7 @@ Growth Data: Monthly Reports
     </tbody>
 </table>
 
-<table class="table table-striped table-bordered table-hover table-nonfluid" id="total_data" class="table">
+<!-- <table class="table table-striped table-bordered table-hover table-nonfluid" id="total_data" class="table">
      <thead>
         <tr>
             <th>FID</th>
@@ -172,7 +172,7 @@ Growth Data: Monthly Reports
         </tr>
 {% endfor %}
     </tbody>
-</table>
+</table> -->
 
 
 {% endblock%}

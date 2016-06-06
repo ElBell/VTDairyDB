@@ -9,7 +9,6 @@ from models import LifeData, db, GrowthData, StatusData
 from dateutil import parser
 import datetime
 
-
 @app.route('/uploads', methods=['GET', 'POST'])
 def uploads():
     if request.method == 'POST':

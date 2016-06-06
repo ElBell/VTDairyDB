@@ -5,7 +5,7 @@ from flask_admin.contrib.sqla import ModelView
 from flask import g, Blueprint, request, url_for, render_template, Response
 from main import app
 from controllers.helpers import admin_required
-from models import User, Role, db, LifeData, StatusData, GrowthData
+from models import User, Role, db, LifeData, StatusData, GrowthData, GrowthDataAverages
 
 
 admin = Admin(app)
@@ -52,5 +52,8 @@ admin.add_view(RoleView(Role, db.session, category='Tables'))
 admin.add_view(ModelIdView(LifeData, db.session, category='Tables'))
 admin.add_view(ModelIdView(StatusData, db.session, category='Tables'))
 admin.add_view(ModelIdView(GrowthData, db.session, category='Tables'))
+admin.add_view(ModelIdView(GrowthDataAverages, db.session, category='Tables'))
+
+
 
 
