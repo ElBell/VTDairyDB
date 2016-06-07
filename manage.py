@@ -3,13 +3,14 @@ import sys, os
 from main import app
 from flask_script import Manager, Server, Command, Option
 from flask_security.utils import encrypt_password
-from models import db, populate_db, StatusData, GrowthData, LifeData
+from models import db, populate_db, StatusData, GrowthData, LifeData, GrowthDataAverages
 from main import app
 import random
 from datetime import date, datetime
 import pandas
 from tqdm import tqdm
 from dateutil import parser
+from sqlalchemy import desc
 
 
 class ResetDB(Command):
@@ -139,6 +140,39 @@ class ProcessGrowthData(Command):
                 # print("Adding weighing "+str(row_name)+", "+date_name+":", weight_data['C'], weight_data.get('D', date_name), weight_data['L'], weight_data['W'], weight_data['H'])
         db.session.commit()
 
+        fids = db.session.query(GrowthData.fid).distinct()
+        for fid in tqdm(fids):
+            fid_data = db.session.query(GrowthData).filter(GrowthData.fid == fid.fid).order_by(desc(GrowthData.date)).all()
+            today = fid_data[0]
+            growth_averages = GrowthDataAverages.query.filter_by(fid=int(fid.fid)).first()
+            life_data = LifeData.query.filter_by(fid=int(fid.fid)).first()
+            if len(fid_data) > 1:
+                previous = fid_data[1]
+                time_dif = today.date - previous.date
+                time_dif = time_dif.days
+                monthly_weight_dif = float(today.weight - previous.weight)
+                monthly_adg = float(monthly_weight_dif/time_dif)
+                if previous.height is not None and today.height is not None:
+                    monthly_height_dif = float(today.height - previous.height)
+                    monthly_height_change = float(monthly_height_dif/time_dif)
+                else:
+                    monthly_height_change = None
+                age = today.date - life_data.dob
+                age = age.days
+                lifetime_weight_dif = float(today.weight - life.bwt)
+                lifetime_adg = float(lifetime_weight_dif/age)
+                if growth_averages is None:
+                    growth_averages = GrowthDataAverages(fid=int(fid.fid), most_recent_date=today.date, monthly_adg=monthly_adg, age=age, lifetime_adg=lifetime_adg, monthly_height_change=monthly_height_change)
+                    db.session.add(growth_averages)
+                else:
+                    growth_averages.most_recent_date = today.date
+                    growth_averages.monthly_adg = monthly_adg
+                    growth_averages.age = age
+                    growth_averages.lifetime_adg = lifetime_adg
+                    growth_averages.monthly_height_change = monthly_height_change
+            else:
+                time_dif = 0
+        db.session.commit()
 
 class DisplayDB(Command):
     def run(self, **kwargs):
