@@ -140,6 +140,8 @@ class ProcessGrowthData(Command):
                 # print("Adding weighing "+str(row_name)+", "+date_name+":", weight_data['C'], weight_data.get('D', date_name), weight_data['L'], weight_data['W'], weight_data['H'])
         db.session.commit()
 
+class CalculateGrowthAverageData(Command):
+    def run(self):
         fids = db.session.query(GrowthData.fid).distinct()
         for fid in tqdm(fids):
             fid_data = db.session.query(GrowthData).filter(GrowthData.fid == fid.fid).order_by(desc(GrowthData.date)).all()
@@ -159,7 +161,7 @@ class ProcessGrowthData(Command):
                     monthly_height_change = None
                 age = today.date - life_data.dob
                 age = age.days
-                lifetime_weight_dif = float(today.weight - life.bwt)
+                lifetime_weight_dif = float(today.weight - life_data.bwt)
                 lifetime_adg = float(lifetime_weight_dif/age)
                 if growth_averages is None:
                     growth_averages = GrowthDataAverages(fid=int(fid.fid), most_recent_date=today.date, monthly_adg=monthly_adg, age=age, lifetime_adg=lifetime_adg, monthly_height_change=monthly_height_change)
@@ -201,6 +203,7 @@ manager.add_command("display_db", DisplayDB())
 manager.add_command("process_growth_data", ProcessGrowthData())
 manager.add_command("process_life_data", ProcessLifeData())
 manager.add_command("convert_all", ConvertAll())
+manager.add_command("calculate_growth_averages", CalculateGrowthAverageData())
 
 if __name__ == "__main__":
     manager.run()

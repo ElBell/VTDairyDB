@@ -93,10 +93,8 @@ def generate_monthly_report(date):
 
 
 def generate_individual_report():
-    for animal in db.session.query(LifeData, GrowthData).outerjoin(GrowthData, LifeData.fid == GrowthData.fid).order_by('date, life_data.fid desc').all():
-        if animal[1] is not None:
-            print animal[1].fid, animal[1].date
-
+    #total_data = db.session.query(LifeData, GrowthDataAverages).outerjoin(GrowthDataAverages, LifeData.fid == GrowthData.fid).all()
+    return total_data
 
 @app.route('/growth_data_monthly_reports', methods=['GET', 'POST'])
 def growth_data_monthly_reports():
@@ -104,7 +102,6 @@ def growth_data_monthly_reports():
     list_dates = [(date[0], date[0]) for date in available_dates]
     growth_search_form = GrowthSearchForm(request.form, date=request.form.get('date', list_dates[0][0]))
     growth_search_form.date.choices = list_dates
-    #print growth_search_form.date.data
     total_data, inside_data, subtotal_breed, subtotal_location, grand_total = [], {}, {}, {}, None
     if request.method == 'POST':
         total_data, inside_data, subtotal_breed, subtotal_location, grand_total = generate_monthly_report(growth_search_form.date.data)
@@ -115,17 +112,8 @@ def growth_data_monthly_reports():
 
 @app.route('/growth_data_individual_reports', methods=['GET', 'POST'])
 def growth_data_individual_reports():
-    #if request.method == 'POST':
-    total_data = generate_individual_report()
+    total_data = GrowthDataAverages.query.all()
+    print total_data
     return render_template('growth_data_individual_reports.html', total_data=total_data)
-
-
-@app.route('/total_growth_data', methods=['GET'])
-def total_growth_data():
-    #total_data = db.session.query(GrowthData, LifeData, StatusData).filter(GrowthData.fid == LifeData.fid == StatusData.fid).all()
-    life_data_table = LifeData.query.all()
-    growth_data_table = GrowthData.query.all()
-
-    return render_template('total_growth_data.html', current_table=growth_data_table)
 
 

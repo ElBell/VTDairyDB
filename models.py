@@ -105,6 +105,9 @@ class GrowthDataAverages(Base):
     monthly_adg = Column(Integer())
     age = Column(Integer())
     monthly_height_change = Column(Integer())
+    def __repr__(self):
+        return "<GrowthDataAverages(fid={fid},most_recent_date={most_recent_date},last_date={last_date},lifetime_adg={lifetime_adg},monthly_adg={monthly_adg},age={age},monthly_height_change={monthly_height_change})>".format(fid=self.fid, most_recent_date=self.most_recent_date, last_date=self.last_date, lifetime_adg=self.lifetime_adg, monthly_adg=self.monthly_adg, age=self.age, monthly_height_change=self.monthly_height_change)
+
 
 
 class GrowthData(Base):

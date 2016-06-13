@@ -4,7 +4,50 @@
 Growth Data: Individual Reports
 {% endblock %}
 
+{% block extracss %}
+
+.table-nonfluid {
+    width: auto !important;
+}
+
+{% endblock %}
+
+{% block extrahead %}
+
+<script type="text/javascript">
+$(document).ready(function(){
+    $('#total_data').DataTable();
+});
+</script>
+
+{% endblock %}
+
 {% block body %}
 
+<table class="table table-striped table-bordered table-hover table-nonfluid" id="total_data" class="table">
+     <thead>
+        <tr>
+            <th>FID</th>
+            <th>Most recent day weighed</th>
+            <th>Monthly ADG</th>
+            <th>Age(d)
+                (as of recent weigh day)</th>
+            <th>Lifetime ADG</th>
+            <th>Monthly Height Change</th>
+        </tr>
+     </thead>
+    <tbody>
+{% for row in total_data %}
+        <tr>
+            <td>{{ row.fid }}</td>
+            <td>{{ row.most_recent_date }}</td>
+            <td>{{ row.monthly_adg }}</td>
+            <td>{{ row.age }}</td>
+            <td>{{ row.lifetime_adg }}</td>
+            <td>{{ row.monthly_height_change }}</td>
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
 
 {% endblock%}
