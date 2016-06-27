@@ -9,6 +9,7 @@ from models import LifeData, db, GrowthData, StatusData, GrowthDataAverages
 from dateutil import parser
 import datetime
 from sqlalchemy import desc
+import numpy as np
 
 
 def calculate_growth_averages(date):
@@ -27,7 +28,10 @@ def calculate_growth_averages(date):
             else:
                 monthly_weight_dif = None
             if time_dif is not 0:
-                monthly_adg = float(monthly_weight_dif/time_dif)
+                if monthly_weight_dif is not 0 and monthly_weight_dif is not None:
+                    monthly_adg = float(monthly_weight_dif/time_dif)
+                else:
+                    monthly_adg = None
             else:
                 monthly_adg = None
             if previous.height is not None and today.height is not None and time_dif is not 0:
@@ -89,10 +93,10 @@ def uploads():
                 file.save(full_filename)
                 data = pandas.read_excel(full_filename)
                 date_list = []
+                everything = set()
                 for index, row in data.iterrows():
                     life = LifeData.query.filter_by(fid=row['FID']).first()
                     if life is None:
-                        print "adding to", row['FID']
                         life = LifeData(fid=row['FID'], eid=row['EID'], breed=row['Breed'], dob=row['DOB'], bwt=row['Birth Weight (kg)'], estimate=True if type(row['Est BW']) is unicode else False)
                         db.session.add(life)
                     else:
@@ -101,13 +105,26 @@ def uploads():
                         life.eid = row['EID']
                         life.bwt = row['Birth Weight (kg)']
                         life.estimate = True if type(row['Est BW']) is unicode else False
+                    everything.add(life.bwt)
+                    if life.bwt is None or np.isnan(life.bwt):
+                        print life.breed
+                        if life.breed == "JE":
+                            life.bwt = 24.94758035
+                            life.estimate = True
+                        elif life.breed == "HO":
+                            life.bwt = 40.8233133
+                            life.estimate = True
+                        else:
+                            life.bwt = 10
+                            life.estimate = True
                     growth = GrowthData(fid=row['FID'], weight=row['Weight (kg)'], location=row['Group'], date=row['Date'], height=row['Height (cm)'] if type(row['Height (cm)']) is float or type(row['Height (cm)']) is int else None)
                     db.session.add(growth)
                     date = row['Date']
                     if date not in date_list:
                         date_list.append(date)
                 db.session.commit()
-                app.logger.info(data)
+                print(everything)
+                #app.logger.info(data)
                 flash("Your file was saved! Please be patient while ADGs are calculated")
 
                 for date in date_list:

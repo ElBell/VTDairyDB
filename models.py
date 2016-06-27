@@ -84,7 +84,7 @@ class LifeData(Base):
     breed = Column(String(20))
     dob = Column(Date())
     bwt = Column(Integer())
-    estimate = Boolean()
+    estimate = Column(Boolean())
     def __repr__(self):
         return "<LifeData(fid={fid},eid={eid},breed={breed},dob={dob},bwt={bwt},estimate={estimate})>".format(fid=self.fid, eid=self.eid, breed=self.breed, dob=self.dob, bwt=self.bwt, estimate=self.estimate)
 
