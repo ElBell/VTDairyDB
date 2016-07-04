@@ -67,9 +67,9 @@ Growth Data: Monthly Reports
             <!-- Lifetime ADG -->
             <tr><td></td><th>Average Lifetime ADG (kg/d)</th>
             {% for location in locations %}
-            <td>{{ inside_data[breed, location].average_lifetime_adg|round(2) if (breed, location) in inside_data  and inside_data[breed, location] is not none and inside_data[breed, location].average_age is not none}}</td>
+            <td>{{ inside_data[breed, location].average_lifetime_adg|round(2) if (breed, location) in inside_data  and inside_data[breed, location] is not none and inside_data[breed, location].average_lifetime_adg is not none}}</td>
             {% endfor %}
-            <th>{{ subtotal_breed[breed].average_lifetime_adg|round(2) if breed in subtotal_breed and subtotal_breed[breed] is not none and subtotal_breed[breed].average_age is not none}}</th>
+            <th>{{ subtotal_breed[breed].average_lifetime_adg|round(2) if breed in subtotal_breed and subtotal_breed[breed] is not none and subtotal_breed[breed].average_lifetime_adg is not none}}</th>
             </tr>
 
             <!-- Height -->

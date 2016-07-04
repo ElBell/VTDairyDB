@@ -46,6 +46,9 @@ class ConvertAll(Command):
         for animal in GrowthData.query.all():
             animal.weight = animal.weight*0.453592 if isinstance(animal.weight, (int, float)) else None
             animal.height = animal.height*2.54 if isinstance(animal.height, (int, float)) else None
+            animal.lifetime_adg = animal.lifetime_adg*0.453592 if isinstance(animal.lifetime_adg, (int, float)) else None
+            animal.monthly_adg = animal.monthly_adg*0.453592 if isinstance(animal.monthly_adg, (int, float)) else None
+            animal.monthly_height_change = (animal.monthly_height_change/10) * 25.4 if isinstance(animal.monthly_height_change, (int, float)) else None
         db.session.commit()
         print("GrowthData converted")
         for animal in LifeData.query.all():
@@ -97,7 +100,7 @@ class ProcessGrowthData(Command):
                 life = LifeData(fid=int(index), bwt=row['BWt'], dob=row['Birthdate'], breed=row['Brd'], estimate=True if type(row['Estimate']) is unicode else False)
                 db.session.add(life)
             else:
-                if life.bwt is not None:
+                if life.bwt is None:
                     life.bwt = row['BWt']
                 life.dob = row['Birthdate']
                 life.breed = row['Brd']
@@ -117,7 +120,7 @@ class ProcessGrowthData(Command):
                 if weight is None:
                     continue
 
-                measurement = GrowthData(fid=int(row_name), date=date, weight=weight, height=parse_float(height) if height is not None else height, location=location)
+                measurement = GrowthData.new(fid=int(row_name), date=date, weight=weight, height=parse_float(height) if height is not None else height, location=location)
                 db.session.add(measurement)
                 # print("Adding weighing "+str(row_name)+", "+date_name+":", weight_data.get('D', date_name), weight_data['L'], weight_data['W'], weight_data['H'])
         db.session.commit()
@@ -135,7 +138,7 @@ class ProcessGrowthData(Command):
                 #print(row_name, weight, date, location, height)
                 if weight is None:
                     continue
-                measurement = GrowthData(fid=int(row_name), bcs=parse_float(bcs) if bcs is not None else bcs, location=location, date=date, weight=weight, height=parse_float(height) if height is not None else height)
+                measurement = GrowthData.new(fid=int(row_name), bcs=parse_float(bcs) if bcs is not None else bcs, location=location, date=date, weight=weight, height=parse_float(height) if height is not None else height)
                 db.session.add(measurement)
                 # print("Adding weighing "+str(row_name)+", "+date_name+":", weight_data['C'], weight_data.get('D', date_name), weight_data['L'], weight_data['W'], weight_data['H'])
         db.session.commit()

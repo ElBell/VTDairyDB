@@ -1,9 +1,10 @@
 __author__ = 'Eleonor Bart'
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date as date_type
 from flask_security.utils import encrypt_password
 import time
 import re
+import pandas
 import os
 import json
 from pprint import pprint
@@ -16,7 +17,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from flask_security import UserMixin, RoleMixin, login_required
 from sqlalchemy import event, Integer, Date, ForeignKey, Column, Table,\
                        String, Boolean, DateTime, Text, ForeignKeyConstraint,\
-                       cast, func, Float
+                       cast, func, Float, desc
 from sqlalchemy.ext.declarative import declared_attr
 
 db = SQLAlchemy(app)
@@ -118,11 +119,54 @@ class GrowthData(Base):
     weight = Column(Integer())
     height = Column(Float())
     bcs = Column(Float())
-    lifetime_adg = Column(Integer())
-    monthly_adg = Column(Integer())
+    lifetime_adg = Column(Float())
+    monthly_adg = Column(Float())
     age = Column(Integer())
-    monthly_height_change = Column(Integer())
+    monthly_height_change = Column(Float())
 
+    @staticmethod
+    def new(fid, date, location, weight, height, bcs=None):
+        life = LifeData.query.filter_by(fid=fid).first()
+        birthdate = life.dob
+        if isinstance(birthdate, pandas.Timestamp):
+            birthdate = birthdate.to_datetime().date()
+        if isinstance(date, pandas.Timestamp):
+            date = date.to_datetime().date()
+        elif isinstance(date, datetime):
+            date = date.date()
+        age = (date - birthdate).days
+        life_bwt = life.bwt
+        if life_bwt is None:
+            if life.breed == 'HO':
+                life_bwt = 90
+            elif life.breed == 'JE':
+                life_bwt = 55
+            else:
+                life_bwt = 80
+        lifetime_adg = (weight - life_bwt) / age
+        previous = GrowthData.query.filter_by(fid=fid).order_by(desc(GrowthData.date)).first()
+        if previous is not None:
+            previous_date = previous.date
+            if isinstance(previous_date, datetime):
+                previous_date = previous_date.date()
+            if previous_date != date:
+                monthly_adg = (weight - previous.weight) / (date - previous_date).days
+            else:
+                monthly_adg = None
+            if previous.height is None or height is None:
+                mhg = None
+            else:
+                if previous_date != date:
+                    height_converted = 10 * (height - previous.height)
+                    mhg = height_converted / (date - previous_date).days
+                else:
+                    mhg = None
+        else:
+            monthly_adg, mhg = None, None
+        gd = GrowthData(fid=fid, date=date, location=location, weight=weight,
+                        height=height, bcs=bcs, lifetime_adg=lifetime_adg,
+                        monthly_adg=monthly_adg, age=age, monthly_height_change=mhg)
+        return gd
 
 def populate_db():
     admin = User(first_name='Eleonor', last_name='Bart',

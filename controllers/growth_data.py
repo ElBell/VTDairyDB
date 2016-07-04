@@ -9,7 +9,7 @@ from dateutil import parser
 from flask_wtf import Form
 from wtforms import StringField, IntegerField, TextAreaField, SubmitField, RadioField, SelectField, validators, ValidationError
 from datetime import date, datetime
-from sqlalchemy import func
+from sqlalchemy import func, desc
 
 class GrowthSearchForm(Form):
     animal = StringField("Animal ID")
@@ -22,6 +22,7 @@ def generate_monthly_report(date):
     current_date = datetime.strptime(date, '%Y-%m-%d').date()
     last_date = db.session.query(GrowthData.date).filter(GrowthData.date < current_date).order_by('date desc').first()[0]
     previous_data = {t.fid: t for t in db.session.query(GrowthData).filter_by(date=last_date).all()}
+    '''
     print last_date
     birth_weights = {t.fid: t for t in db.session.query(LifeData).all()}
     current_data = db.session.query(GrowthData).filter_by(date=current_date).all()
@@ -68,6 +69,7 @@ def generate_monthly_report(date):
             lifetime_changed_weight = None
             animal.age = None
     db.session.commit()
+    '''
 
     total_data = db.session.query(GrowthData, LifeData).filter(GrowthData.date == date, GrowthData.fid == LifeData.fid).all()
 
@@ -112,8 +114,16 @@ def growth_data_monthly_reports():
 
 @app.route('/growth_data_individual_reports', methods=['GET', 'POST'])
 def growth_data_individual_reports():
-    total_data = GrowthDataAverages.query.all()
+    fids = db.session.query(GrowthData.fid).distinct()
+    total_data = [db.session.query(GrowthData).filter(GrowthData.fid == fid.fid).order_by(desc(GrowthData.date)).first()
+                  for fid in fids]
+    '''
+    total_data = GrowthData.query(GrowthData.fid,
+                                  GrowthData.date, GrowthData.lifetime_adg,
+                                  GrowthData.monthly_adg, GrowthData.age,
+                                  GrowthData.monthly_height_change).order_by("date desc").first()
     print total_data
+    '''
     return render_template('growth_data_individual_reports.html', total_data=total_data)
 
 

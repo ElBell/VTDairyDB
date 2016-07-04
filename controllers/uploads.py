@@ -105,7 +105,7 @@ def uploads():
                         life.eid = row['EID']
                         life.bwt = row['Birth Weight (kg)']
                         life.estimate = True if type(row['Est BW']) is unicode else False
-                    everything.add(life.bwt)
+                    print life.breed
                     if life.bwt is None or np.isnan(life.bwt):
                         print life.breed
                         if life.breed == "JE":
@@ -117,7 +117,7 @@ def uploads():
                         else:
                             life.bwt = 10
                             life.estimate = True
-                    growth = GrowthData(fid=row['FID'], weight=row['Weight (kg)'], location=row['Group'], date=row['Date'], height=row['Height (cm)'] if type(row['Height (cm)']) is float or type(row['Height (cm)']) is int else None)
+                    growth = GrowthData.new(fid=row['FID'], weight=row['Weight (kg)'], location=row['Group'], date=row['Date'], height=row['Height (cm)'] if type(row['Height (cm)']) is float or type(row['Height (cm)']) is int else None)
                     db.session.add(growth)
                     date = row['Date']
                     if date not in date_list:
@@ -127,8 +127,8 @@ def uploads():
                 #app.logger.info(data)
                 flash("Your file was saved! Please be patient while ADGs are calculated")
 
-                for date in date_list:
-                    calculate_growth_averages(date)
+                #for date in date_list:
+                #    calculate_growth_averages(date)
 
                 flash("All done!")
 
