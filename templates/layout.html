@@ -19,6 +19,8 @@
 
     <link href="{{ url_for('static', filename='libs/dashboard.css') }}" rel="stylesheet">
 
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="{{ url_for('static', filename='libs/jquery.js')}}"></script>
@@ -42,7 +44,7 @@
     {% endblock %}
 
     $(document).ready(function () {
-        $("#{{request.endpoint}}").parent().addClass("active");
+        $(".{{request.endpoint}}").parent().addClass("active");
     })
     </script>
 
@@ -50,7 +52,7 @@
   </head>
 <body>
 
-<nav class="navbar navbar-inverse navbar-fixed-top" style="background-color: #660000;">
+<nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container-fluid">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -72,7 +74,6 @@
           {% else %}
           <p class="navbar-right navbar-btn">
           <a class="navbar-link btn btn-default" href="{{ url_for('security.login') }}">Log in</a>
-          <a class="navbar-link btn btn-default" href="{{ url_for('security.register') }}">Register</a>
           </p>
           {% endif %}
            <form class="navbar-form navbar-right">
@@ -86,17 +87,20 @@
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
-            <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
+            <li><a class="index" href="#">Overview <span class="sr-only">(current)</span></a></li>
             <!---<li><a href="{{ url_for( 'hello_cow' ) }}">Cow</a></li> -->
-            <li><a href="{{ url_for( 'life_data' ) }}">Life Data</a></li>
-            <li><a href="{{ url_for( 'growth_data_monthly_reports', month='current' ) }}">Growth Data</a>
+            <li><a class='life_data' href="{{ url_for( 'life_data' ) }}">Life Data</a></li>
+            <li><a class="growth_data_monthly_reports growth_data_individual_reports" href="{{ url_for( 'growth_data_monthly_reports', month='current' ) }}">Growth Data</a>
                 <ul>
                 <li><a href="{{ url_for( 'growth_data_monthly_reports' ) }}">Monthly Reports</a></li>
                 <li><a href="{{ url_for( 'growth_data_individual_reports' ) }}">Individual Reports</a></li>
                 </ul></li>
-            <li><a href="{{ url_for( 'uploads' ) }}">Uploads</a></li>
-            <li><a href="{{ url_for( 'filter' ) }}">Filter Data</a></li>
-            <li><a href="#">Account</a></li>
+            <li><a class="uploads" href="{{ url_for( 'uploads' ) }}">Uploads</a></li>
+            <li><a class="filter" href="{{ url_for( 'filter' ) }}">Filter Data</a></li>
+            {% if g.user and g.user.is_admin() %}
+              <li><a class="add_user" href="{{ url_for( 'add_user' ) }}">Add User</a> </li>
+              <li><a class="admin.index" href="{{ url_for( 'admin.index' ) }}">Admin</a></li>
+            {% endif %}
           </ul>
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">

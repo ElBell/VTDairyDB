@@ -8,9 +8,11 @@ import pandas
 from models import LifeData, db, GrowthData, StatusData
 from dateutil import parser
 import datetime
+from helpers import login_required
 
 
 @app.route('/filter', methods=['GET', 'POST'])
+@login_required
 def filter():
     filtered_data = []
     if request.method == 'POST':

@@ -1,0 +1,21 @@
+{%extends 'layout.html'%}
+
+{% block title %}
+Homepage
+{% endblock %}
+
+{% block body %}
+
+{% from "_formhelpers.html" import render_field %}
+<form method=post action="#">
+  <dl>
+    {{ render_field(form.first_name) }}
+    {{ render_field(form.last_name) }}
+    {{ render_field(form.email) }}
+    {{ render_field(form.password) }}
+    {{ render_field(form.admin) }}
+  </dl>
+  <p><input type=submit value=Register>
+</form>
+
+{% endblock%}

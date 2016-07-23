@@ -10,6 +10,8 @@ from flask_wtf import Form
 from wtforms import StringField, IntegerField, TextAreaField, SubmitField, RadioField, SelectField, validators, ValidationError
 from datetime import date, datetime
 from sqlalchemy import func, desc
+from helpers import login_required
+
 
 class GrowthSearchForm(Form):
     animal = StringField("Animal ID")
@@ -17,6 +19,7 @@ class GrowthSearchForm(Form):
     #group = SelectField("Group", choices=[('24', '24'), ('27', '27')])
     date = SelectField("Weigh Day:")
     submit = SubmitField("Submit")
+
 
 def generate_monthly_report(date):
     current_date = datetime.strptime(date, '%Y-%m-%d').date()
@@ -99,6 +102,7 @@ def generate_individual_report():
     return total_data
 
 @app.route('/growth_data_monthly_reports', methods=['GET', 'POST'])
+@login_required
 def growth_data_monthly_reports():
     available_dates = db.session.query(GrowthData.date).order_by("date desc").distinct()
     list_dates = [(date[0], date[0]) for date in available_dates]
@@ -113,6 +117,7 @@ def growth_data_monthly_reports():
 
 
 @app.route('/growth_data_individual_reports', methods=['GET', 'POST'])
+@login_required
 def growth_data_individual_reports():
     fids = db.session.query(GrowthData.fid).distinct()
     total_data = [db.session.query(GrowthData).filter(GrowthData.fid == fid.fid).order_by(desc(GrowthData.date)).first()

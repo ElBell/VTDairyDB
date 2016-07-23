@@ -39,4 +39,5 @@ import uploads
 import life_data
 import growth_data
 import filter
+import add_user
 

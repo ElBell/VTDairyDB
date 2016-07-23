@@ -10,6 +10,7 @@ from dateutil import parser
 import datetime
 from sqlalchemy import desc
 import numpy as np
+from helpers import login_required
 
 
 def calculate_growth_averages(date):
@@ -64,6 +65,7 @@ def calculate_growth_averages(date):
 
 
 @app.route('/uploads', methods=['GET', 'POST'])
+@login_required
 def uploads():
     if request.method == 'POST':
         file = request.files['file']
@@ -117,7 +119,7 @@ def uploads():
                         else:
                             life.bwt = 10
                             life.estimate = True
-                    growth = GrowthData.new(fid=row['FID'], weight=row['Weight (kg)'], location=row['Group'], date=row['Date'], height=row['Height (cm)'] if type(row['Height (cm)']) is float or type(row['Height (cm)']) is int else None)
+                    growth = GrowthData.new(fid=row['FID'], weight=row['Weight'], location=row['Group'], date=row['Date'], height=row['Height'] if type(row['Height']) is float or type(row['Height']) is int else None)
                     db.session.add(growth)
                     date = row['Date']
                     if date not in date_list:

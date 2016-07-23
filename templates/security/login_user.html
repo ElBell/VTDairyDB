@@ -28,7 +28,7 @@ Login
             {{ render_field_with_errors(login_user_form.remember, class_='checkbox') }}
         </div><br>
         <div class="form-group">
-            {{ login_user_form.submit(class_='btn btn-default') }} or <a href='{{ url_for_security("register") }}'>register</a> or <a href='{{ url_for('security.forgot_password') }}'>reset your password</a>
+            {{ login_user_form.submit(class_='btn btn-default') }} or <a href='{{ url_for("security.forgot_password") }}'>reset your password</a>
         </div>
     </form>
 </div>

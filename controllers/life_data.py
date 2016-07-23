@@ -6,9 +6,11 @@ import os
 import pandas
 from models import LifeData, db
 from dateutil import parser
+from helpers import login_required
 
 
 @app.route('/life_data', methods=['GET'])
+@login_required
 def life_data():
     life_data_table = LifeData.query.all()
 
