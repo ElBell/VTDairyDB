@@ -9,6 +9,7 @@ import os
 import json
 from pprint import pprint
 import logging
+import numpy as np
 
 from main import app
 
@@ -126,43 +127,45 @@ class GrowthData(Base):
 
     @staticmethod
     def new(fid, date, location, weight, height, bcs=None):
-        life = LifeData.query.filter_by(fid=fid).first()
-        birthdate = life.dob
-        if isinstance(birthdate, pandas.Timestamp):
-            birthdate = birthdate.to_datetime().date()
+        # Get the date part of the datetime
         if isinstance(date, pandas.Timestamp):
             date = date.to_datetime().date()
         elif isinstance(date, datetime):
             date = date.date()
-        age = (date - birthdate).days
-        life_bwt = life.bwt
-        if life_bwt is None:
-            if life.breed == 'HO':
-                life_bwt = 90
-            elif life.breed == 'JE':
-                life_bwt = 55
-            else:
-                life_bwt = 80
-        lifetime_adg = (weight - life_bwt) / age
+
+        # Get life data, or create it if it doesn't exist
+        life = LifeData.query.filter_by(fid=fid).first()
+        if life is None:
+            life = LifeData(fid=fid, dob=date-timedelta(days=15))
+            set_estimated_life_data(life)
+
+        # Calculate age
+        age = 15 # Default if we don't have it
+        if life.dob is not None:
+            birth_date = life.dob
+            if isinstance(birth_date, pandas.Timestamp):
+                birth_date = birth_date.to_datetime().date()
+            if date is not None:
+                age = (date - birth_date).days
+
+        # Guaranteed to have a bwt, even if it's estimated
+        lifetime_adg = None
+        if weight is not None and age is not None:
+            lifetime_adg = (weight - life.bwt) / age
         previous = GrowthData.query.filter_by(fid=fid).order_by(desc(GrowthData.date)).first()
+        monthly_adg, mhg = None, None
         if previous is not None:
             previous_date = previous.date
             if isinstance(previous_date, datetime):
                 previous_date = previous_date.date()
             if previous_date != date:
-                monthly_adg = (weight - previous.weight) / (date - previous_date).days
-            else:
-                monthly_adg = None
-            if previous.height is None or height is None:
-                mhg = None
-            else:
+                if previous_date is not None and previous.weight is not None and weight is not None and date is not None:
+                    monthly_adg = (weight - previous.weight) / (date - previous_date).days
+            if previous.height is not None and height is not None:
                 if previous_date != date:
                     height_converted = 10 * (height - previous.height)
                     mhg = height_converted / (date - previous_date).days
-                else:
-                    mhg = None
-        else:
-            monthly_adg, mhg = None, None
+
         gd = GrowthData(fid=fid, date=date, location=location, weight=weight,
                         height=height, bcs=bcs, lifetime_adg=lifetime_adg,
                         monthly_adg=monthly_adg, age=age, monthly_height_change=mhg)
@@ -185,3 +188,13 @@ def populate_db():
 
 
     db.session.commit()
+
+
+def set_estimated_life_data(life):
+    if life.bwt is None or np.isnan(life.bwt):
+        life.estimate = True
+        life.bwt = 33
+        if life.breed is not None and life.breed == "JE":
+            life.bwt = 24.94758035
+        elif life.breed is not None and life.breed == "HO":
+            life.bwt = 40.8233133

@@ -5,7 +5,8 @@ from flask import session, g, send_from_directory, request, jsonify, render_temp
 import os
 from werkzeug import secure_filename
 import pandas
-from models import LifeData, db, GrowthData, StatusData, GrowthDataAverages
+from models import LifeData, db, GrowthData, StatusData, GrowthDataAverages, set_estimated_life_data
+
 from dateutil import parser
 import datetime
 from sqlalchemy import desc
@@ -16,7 +17,8 @@ from helpers import login_required
 def calculate_growth_averages(date):
     fids = db.session.query(GrowthData).filter_by(date=date).all()
     for fid in fids:
-        fid_data = db.session.query(GrowthData).filter(GrowthData.fid == fid.fid).order_by(desc(GrowthData.date)).all()
+        fid_data = db.session.query(GrowthData).filter(GrowthData.fid == fid.fid,
+                                                       GrowthData.date >= date).order_by(desc(GrowthData.date)).all()
         today = fid_data[0]
         growth_averages = GrowthDataAverages.query.filter_by(fid=int(fid.fid)).first()
         life_data = LifeData.query.filter_by(fid=int(fid.fid)).first()
@@ -64,6 +66,16 @@ def calculate_growth_averages(date):
     db.session.commit()
 
 
+def read_pandas_file(filename):
+    if filename.endswith('.csv'):
+        data = pandas.read_csv(filename)
+    elif filename.endswith('.xlsx'):
+        data = pandas.read_excel(filename)
+    else:
+        raise Exception("Unknown filetype")
+    return data
+
+
 @app.route('/uploads', methods=['GET', 'POST'])
 @login_required
 def uploads():
@@ -74,42 +86,51 @@ def uploads():
                 filename = secure_filename(file.filename)
                 full_filename = os.path.join(app.config["UPLOAD_FOLDER"], filename)
                 file.save(full_filename)
-                data = pandas.read_csv(full_filename)
-                data = data.dropna()
-                # Removes the first two rows of not data
-                data = data.ix[4:]
-                # Labels the columns as follows (so columns MUST BE IN THIS ORDER)
-                data.columns = ['FID', 'EID', 'Breed', 'DOB']
-                app.logger.info(data)
+                data = read_pandas_file(full_filename)
+
                 flash("Your file was saved!")
-
                 for index, row in data.iterrows():
-                    cow = LifeData(fid=row['FID'], eid=row['EID'], breed=row['Breed'], dob=parser.parse(row['DOB']))
-                    db.session.add(cow)
-                # Add won't happen without commit
-                db.session.commit()
-
-            elif request.form['type'] == 'growth_data':
-                filename = secure_filename(file.filename)
-                full_filename = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-                file.save(full_filename)
-                data = pandas.read_excel(full_filename)
-                date_list = []
-                everything = set()
-                for index, row in data.iterrows():
-                    life = LifeData.query.filter_by(fid=row['FID']).first()
+                    if 'FID' in data:
+                        life = LifeData.query.filter_by(fid=row['FID']).first()
+                    if 'Index' in data:
+                        life = LifeData.query.filter_by(fid=row['Index']).first()
+                    # life = LifeData.query.filter_by(fid=row['FID']).first()
                     if life is None:
-                        life = LifeData(fid=row['FID'], eid=row['EID'], breed=row['Breed'], dob=row['DOB'], bwt=row['Birth Weight (kg)'], estimate=True if type(row['Est BW']) is unicode else False)
+                        breed = row.get('Breed', 'Unknown')
+                        eid = row.get('EID', None)
+                        bwt = row.get('Birth Weight', None)
+                        estimate = bwt is None
+                        dob = row.get('DOB', None)
+                        if dob is not None:
+                            if isinstance(dob, pandas.Timestamp):
+                                dob = dob.to_datetime().date()
+                            else:
+                                dob = datetime.datetime.strptime(dob, '%m/%d/%Y').date()
+                        if 'FID' in data:
+                            fid=row['FID']
+                        if 'Index' in data:
+                            fid=row['Index']
+                        life = LifeData(fid=fid, eid=eid, breed=breed, dob=dob, bwt=bwt, estimate=estimate)
+
                         db.session.add(life)
+
                     else:
-                        life.dob = row['DOB']
-                        life.breed = row['Breed']
-                        life.eid = row['EID']
-                        life.bwt = row['Birth Weight (kg)']
-                        life.estimate = True if type(row['Est BW']) is unicode else False
-                    print life.breed
-                    if life.bwt is None or np.isnan(life.bwt):
-                        print life.breed
+                        if 'DOB' in data:
+                            dob = row['DOB']
+                            if isinstance(dob, pandas.Timestamp):
+                                dob = dob.to_datetime().date()
+                            else:
+                                dob = datetime.datetime.strptime(dob, '%m/%d/%Y').date()
+                            life.dob = dob
+                        if 'Breed' in data:
+                            life.breed = row['Breed']
+                        if 'EID' in data:
+                            life.eid = row['EID']
+                        if 'Birth Weight' in data:
+                            life.bwt = row['Birth Weight']
+                        if 'Est BW' in data:
+                            life.estimate = True if type(row['Est BW']) is unicode else False
+                    if life.bwt is None or np.isnan(life.bwt) or life.estimate:
                         if life.breed == "JE":
                             life.bwt = 24.94758035
                             life.estimate = True
@@ -117,15 +138,80 @@ def uploads():
                             life.bwt = 40.8233133
                             life.estimate = True
                         else:
-                            life.bwt = 10
+                            life.bwt = 30
                             life.estimate = True
-                    growth = GrowthData.new(fid=row['FID'], weight=row['Weight'], location=row['Group'], date=row['Date'], height=row['Height'] if type(row['Height']) is float or type(row['Height']) is int else None)
+                        # Add won't happen without commit
+                db.session.commit()
+
+            elif request.form['type'] == 'growth_data':
+                filename = secure_filename(file.filename)
+                full_filename = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+                file.save(full_filename)
+                if full_filename.endswith('.xlsx'):
+                    data = pandas.read_excel(full_filename)
+                if full_filename.endswith('.csv'):
+                    data = pandas.read_csv(full_filename)
+                date_list = []
+                everything = set()
+                for index, row in data.iterrows():
+                    if 'FID' in data:
+                        life = LifeData.query.filter_by(fid=row['FID']).first()
+                    if 'Index' in data:
+                        life = LifeData.query.filter_by(fid=row['Index']).first()
+                    if life is None:
+                        eid = None
+                        dob = None
+                        breed = 'Unknown'
+                        bwt = None
+                        estimate = True
+                        if "Breed" in row:
+                            breed = row['Breed']
+                        if 'Birth Weight' in data:
+                            bwt = row['Birth Weight']
+                            estimate = False
+                        if 'EID' in data:
+                            eid = row['EID']
+                        if 'DOB' in data:
+                            dob = parse_date(row['DOB'])
+                        life = LifeData(fid=row['FID'], eid=eid, breed=breed, dob=dob, bwt=bwt, estimate=estimate)
+
+                        db.session.add(life)
+                    else:
+                        if 'DOB' in data:
+                            dob = parse_date(row['DOB'])
+                            life.dob = dob
+                        if 'Breed' in data:
+                            life.breed = row['Breed']
+                        if 'EID' in data:
+                            life.eid = row['EID']
+                        if 'Birth Weight' in data:
+                            life.bwt = row['Birth Weight']
+                        if 'Est BW' in data:
+                            life.estimate = True if type(row['Est BW']) is unicode else False
+                    # SHOULD THIS BE HERE??????????????????????????????????????????????????????????????????????????????
+                    set_estimated_life_data(life)
+
+                    weight = None
+                    location = None
+                    date = None
+                    height = None
+                    if 'Weight' in data:
+                        weight = parse_float_field(row['Weight'])
+                    if 'Group' in data:
+                        location = row['Group']
+                    if 'Date' in data:
+                        date = parse_date(row['Date'])
+                    if 'Height' in data:
+                        #height = row['Height'] if type(row['Height']) is float or type(row['Height']) is int else None
+                        height = parse_float_field(row['Height'])
+                    growth = GrowthData.new(fid=row['FID'], weight=weight, location=location, date=date, height=height)
                     db.session.add(growth)
-                    date = row['Date']
+                    date = None
+                    if 'Date' in data:
+                        date = row['Date']
                     if date not in date_list:
                         date_list.append(date)
                 db.session.commit()
-                print(everything)
                 #app.logger.info(data)
                 flash("Your file was saved! Please be patient while ADGs are calculated")
 
@@ -139,4 +225,17 @@ def uploads():
     return render_template('uploads.html')
 
 
+def parse_date(date):
+    if isinstance(date, pandas.Timestamp):
+        return date.to_datetime().date()
+    else:
+        return datetime.datetime.strptime(date, '%m/%d/%Y')
+
+
+def parse_float_field(a_value):
+    try:
+        float(a_value)
+    except ValueError:
+        return None
+    return float(a_value)
 
