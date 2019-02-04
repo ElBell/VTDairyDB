@@ -1,2 +1,2 @@
 # VTDairyDB
-Cow stuff
+A database for herd data
